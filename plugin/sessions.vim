@@ -4,8 +4,12 @@ let s:path = expand('<sfile>:h')
 let s:jumpListPosition = 1
 
 function! s:GetLineFromJumpList(lineNumber)
-    let jumplist = s:GetSessionFilename('jumplist')
-    return readfile(jumplist, '', -a:lineNumber)[0]
+    let jumplist = s:GetJumpListFilename()
+    if filereadable(jumplist)
+        return readfile(jumplist, '', -a:lineNumber)[0]
+    else
+        return ""
+    endif
 endfunction
 
 function! s:TravelJumpList()
@@ -16,8 +20,12 @@ endfunction
 
 com! -nargs=0 SessionTravel :call s:TravelJumpList()
 
+function! s:GetJumpListFilename()
+    return s:path .'/../.jumplist'
+endfunction
+
 function! s:WriteLineToJumpList(session)
-    let jumplist = s:GetSessionFilename('jumplist')
+    let jumplist = s:GetJumpListFilename()
     call writefile([a:session], jumplist, "a")
 endfunction
 
@@ -30,11 +38,17 @@ function! s:AddToJumpList(session)
 endfunction
 
 function! s:SessionSave(session)
+    if a:session == ""
+        return
+    endif
     exe 'mksession! ' . s:GetSessionFilename(a:session)
     call s:AddToJumpList(a:session)
 endfunction
 
 function! s:SessionRestore(session, jump)
+    if a:session == ""
+        return
+    endif
     let filename = s:GetSessionFilename(a:session)
     if filereadable(filename)
         exe 'source ' . filename
