@@ -11,7 +11,6 @@ endfunction
 function! s:TravelJumpList()
     let line = s:GetLineFromJumpList(s:jumpListPosition)
     let s:jumpListPosition = s:jumpListPosition + 1
-    echo line
     call s:SessionRestore(line, 0)
 endfunction
 
