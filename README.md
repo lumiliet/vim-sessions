@@ -4,11 +4,11 @@ Vim plugin to help manage vim sessions. You can save sessions using `:SessionSav
 
 ## Examples
 
-* `<Leader>ssh` save session `h`.
-* `<Leader>srh` restore session `h`.
+* `<Leader>ssn` save session `n`.
+* `<Leader>srn` restore session `n`.
+* `<Leader>so` jump back in session history. Will restore session `n` if run in this order.
 * `:SessionSave mySession` save session `mySession`.
 * `:SessionRestore mySession` restore session `mySession`.
-* `<Leader>so` jump back in session history.
 
 ## Notes
 
