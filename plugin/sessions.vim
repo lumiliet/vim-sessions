@@ -21,12 +21,23 @@ function! s:SessionRestore(session, jump)
     endif
     let filename = s:GetSessionFilename(a:session)
     if filereadable(filename)
+        call s:DeleteBuffers()
         exe 'source ' . filename
         if a:jump
             call s:AddToJumpList(a:session)
         endif
     endif
 endfunction
+
+function! s:DeleteBuffers()
+    let b_all = range(1, bufnr('$'))
+    let b_unl = filter(b_all, 'buflisted(v:val)')
+    for i in b_unl
+        exe i . 'bd'
+    endfor
+endfunction
+
+call s:DeleteBuffers()
 
 function! s:OnClose()
     call s:SessionSave(strftime("%c"))
