@@ -1,7 +1,42 @@
+com! -nargs=1 SessionSave :call s:SessionSave('<args>')
+com! -nargs=1 SessionRestore :call s:SessionRestore('<args>',1)
+com! -nargs=0 SessionTravel :call s:TravelJumpList()
+
+autocmd VimLeave * :call s:OnClose()
 
 let s:path = expand('<sfile>:h')
-
 let s:jumpListPosition = 1
+
+function! s:SessionSave(session)
+    if a:session == ""
+        return
+    endif
+    exe "mksession! " . s:GetSessionFilename(a:session)
+    call s:AddToJumpList(a:session)
+endfunction
+
+function! s:SessionRestore(session, jump)
+    if a:session == ""
+        return
+    endif
+    let filename = s:GetSessionFilename(a:session)
+    if filereadable(filename)
+        exe 'source ' . filename
+        if a:jump
+            call s:AddToJumpList(a:session)
+        endif
+    endif
+endfunction
+
+function! s:OnClose()
+    call s:SessionSave(strftime("%c"))
+endfunction
+
+function! s:TravelJumpList()
+    let line = s:GetLineFromJumpList(s:jumpListPosition)
+    let s:jumpListPosition = s:jumpListPosition + 1
+    call s:SessionRestore(line, 0)
+endfunction
 
 function! s:GetLineFromJumpList(lineNumber)
     let jumplist = s:GetJumpListFilename()
@@ -11,14 +46,6 @@ function! s:GetLineFromJumpList(lineNumber)
         return ""
     endif
 endfunction
-
-function! s:TravelJumpList()
-    let line = s:GetLineFromJumpList(s:jumpListPosition)
-    let s:jumpListPosition = s:jumpListPosition + 1
-    call s:SessionRestore(line, 0)
-endfunction
-
-com! -nargs=0 SessionTravel :call s:TravelJumpList()
 
 function! s:GetJumpListFilename()
     return s:path .'/../.jumplist'
@@ -37,33 +64,9 @@ function! s:AddToJumpList(session)
     endif
 endfunction
 
-function! s:SessionSave(session)
-    if a:session == ""
-        return
-    endif
-    exe 'mksession! ' . s:GetSessionFilename(a:session)
-    call s:AddToJumpList(a:session)
-endfunction
-
-function! s:SessionRestore(session, jump)
-    if a:session == ""
-        return
-    endif
-    let filename = s:GetSessionFilename(a:session)
-    if filereadable(filename)
-        exe 'source ' . filename
-        if a:jump
-            call s:AddToJumpList(a:session)
-        endif
-    endif
-endfunction
-
 function! s:GetSessionFilename(session)
-    return s:path .'/../sessions/' . a:session . '.session'
+    return s:path .'/../sessions/' . substitute(a:session, '\s', '-', 'g') . '.session'
 endfunction
-
-com! -nargs=1 SessionSave :call s:SessionSave('<args>')
-com! -nargs=1 SessionRestore :call s:SessionRestore('<args>',1)
 
 function! s:Map(Fun, list)
     if len(a:list) == 0
@@ -77,7 +80,6 @@ function! s:MapKeys()
     let numbers = range(1,9)
     let letters = s:Map(function('nr2char'), range(char2nr('a'), char2nr('z')))
 
-    call s:MapList(numbers)
     call s:MapList(letters)
 endfunction
 
