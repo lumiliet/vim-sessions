@@ -1,4 +1,4 @@
-com! -nargs=1 SessionSave :call s:SessionSave('<args>')
+com! -nargs=1 SessionSave :call s:SessionSave('<args>', 1)
 com! -nargs=1 SessionRestore :call s:SessionRestore('<args>',1)
 com! -nargs=0 SessionTravel :call s:TravelJumpList()
 
@@ -7,12 +7,14 @@ autocmd VimLeave * :call s:OnClose()
 let s:path = expand('<sfile>:h')
 let s:jumpListPosition = 1
 
-function! s:SessionSave(session)
+function! s:SessionSave(session, addToJumplist)
     if a:session == ""
         return
     endif
     exe "mksession! " . s:GetSessionFilename(a:session)
-    call s:AddToJumpList(a:session)
+    if a:addToJumplist
+        call s:AddToJumpList(a:session)
+    endif
 endfunction
 
 function! s:SessionRestore(session, jump)
@@ -33,14 +35,12 @@ function! s:DeleteBuffers()
     let b_all = range(1, bufnr('$'))
     let b_unl = filter(b_all, 'buflisted(v:val)')
     for i in b_unl
-        exe i . 'bd'
+        exe i . 'bd!'
     endfor
 endfunction
 
-call s:DeleteBuffers()
-
 function! s:OnClose()
-    call s:SessionSave(strftime("%c"))
+    call s:SessionSave(strftime("%c"), 0)
 endfunction
 
 function! s:TravelJumpList()
