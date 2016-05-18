@@ -18,6 +18,14 @@ A session is saved each time you close Vim. These can be restored with `:Session
 * `:SessionSave mySession` save session `mySession`.
 * `:SessionRestore mySession` restore session `mySession`.
 
+## Tips
+
+The default behaviour is to include global mappings and options in the session files. Loading an old session file will therefore include old mappings and options which might not work correctly anymore. This may or may not be what you want. Add the following line to your `.vimrc` to disable this feature.
+```shell
+let &sessionoptions = substitute(&sessionoptions, 'options,', '', '')
+```
+
+
 ## Notes
 
 The sessions are stored in `vim-plugin-folder/vim-sessions/sessions`. To manually restore a session you run `:source {path-to-session-file}` in Vim. You can also start Vim with a session from the command line: `vim -S {path-to-session-file}`.
