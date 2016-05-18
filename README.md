@@ -20,7 +20,7 @@ A session is saved each time you close Vim. These can be restored with `:Session
 
 ## Tips
 
-The default behaviour is to include global mappings and options in the session files. Loading an old session file will therefore include old mappings and options which might not work correctly anymore. This may or may not be what you want. Add the following line to your `.vimrc` to disable this feature.
+The default behaviour is to include global mappings and options in the session files. Loading an old session will therefore include old mappings and options which might not work correctly anymore. This may or may not be what you want. Add the following line to your `.vimrc` to disable this feature.
 ```shell
 let &sessionoptions = substitute(&sessionoptions, 'options,', '', '')
 ```
